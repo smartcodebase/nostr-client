@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { SimplePool, nip19, type Event } from "nostr-tools";
 import { getPublicKey, finalizeEvent } from "nostr-tools";
 
@@ -35,8 +35,6 @@ export default function NostrProfilesViewer() {
   useEffect(() => {
     const load = async () => {
       const fetchedProfiles = await fetchProfiles(PUBKEYS, RELAY_URL);
-      console.log("USER> here, ffffffffffffffff");
-      console.log(fetchedProfiles);
       setProfiles(fetchedProfiles);
 
       const pool = new SimplePool();
@@ -52,8 +50,6 @@ export default function NostrProfilesViewer() {
         ],
         {
           onevent(event) {
-            console.log("USER> here, eeeeeeeeeee");
-            console.log(event);
             setPosts((prev) => {
               const userPosts = prev[event.pubkey] || [];
               if (userPosts.find((e) => e.id === event.id)) return prev;
@@ -194,8 +190,6 @@ export default function NostrProfilesViewer() {
     await new SimplePool().publish([RELAY_URL], textNote);
 
     if (mediaUrl) {
-      console.log("USER> 99999999999999999999999");
-      console.log(textNote.id);
       const mediaNote = finalizeEvent(
         {
           kind: 30001,
@@ -217,16 +211,6 @@ export default function NostrProfilesViewer() {
     setMediaUrl("");
     setReplyingPostId(null);
   }
-
-  const privHex =
-    "625d938310d9578e59f31a09af49d4e54cce5f87f0fbc5c0a41e769ebcaf4693";
-  const privKey = hexToBytes(privHex);
-  const publicKey = getPublicKey(privKey);
-  const npub = nip19.npubEncode(publicKey);
-
-  console.log("USER> 66666666666666666666666");
-  console.log(publicKey);
-  console.log(npub);
 
   return (
     <div className="p-6 max-w-4xl mx-auto">

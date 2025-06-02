@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { SimplePool, nip19 } from "nostr-tools";
 import type { Event } from "nostr-tools";
 
@@ -18,7 +18,7 @@ export default function NostrFeed() {
     const pool = new SimplePool();
 
     try {
-      const subText = pool.subscribeMany(
+      pool.subscribeMany(
         RELAY_URLS,
         // [{ kinds: [1], limit: 50 }],
         // [
@@ -81,7 +81,7 @@ export default function NostrFeed() {
       "#e": [id],
     }));
 
-    const subMedia = pool.subscribeMany(RELAY_URLS, filters, {
+    pool.subscribeMany(RELAY_URLS, filters, {
       onevent(event) {
         setMediaNotes((prev) => {
           const already = prev.find((n) => n.id === event.id);

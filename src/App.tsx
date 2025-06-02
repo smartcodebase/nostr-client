@@ -1,5 +1,5 @@
 import "./App.css";
-import NostrFeed from "./components/NostrFeed";
+// import NostrFeed from "./components/NostrFeed";
 import NostrProfilesViewer from "./components/NostrProfilesViewer";
 
 function App() {

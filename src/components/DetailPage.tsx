@@ -25,6 +25,7 @@ function formatTimestamp(timestamp: number) {
 
 export default function DetailPage() {
   const { pubkey } = useParams();
+  const [loading, setLoading] = useState(true);
   const [posts, setPosts] = useState<Event[]>([]);
   const [mediaNotes, setMediaNotes] = useState<Event[]>([]);
   const [replies, setReplies] = useState<Event[]>([]);
@@ -46,6 +47,8 @@ export default function DetailPage() {
       const replyIds = fetchedReplies.map((r) => r.id);
       const fetchedReplyMedia = await fetchMediaNotesForEvents(replyIds);
       setReplyMediaNotes(fetchedReplyMedia);
+
+      setLoading(false);
     };
 
     load();
@@ -96,15 +99,24 @@ export default function DetailPage() {
         <div className="divider">Filter By</div>
         <div className="form-control flex flex-col gap-2">
           <label className="label cursor-pointer justify-start gap-2">
-            <input type="checkbox" className="checkbox checkbox-accent" />
-            <span className="label-text">Twitter</span>
+            <input
+              type="checkbox"
+              className="checkbox checkbox-sm checkbox-accent"
+            />
+            <span className="label-text">Twitters</span>
           </label>
           <label className="label cursor-pointer justify-start gap-2">
-            <input type="checkbox" className="checkbox checkbox-primary" />
+            <input
+              type="checkbox"
+              className="checkbox checkbox-sm checkbox-primary"
+            />
             <span className="label-text">Facebook</span>
           </label>
           <label className="label cursor-pointer justify-start gap-2">
-            <input type="checkbox" className="checkbox checkbox-secondary" />
+            <input
+              type="checkbox"
+              className="checkbox checkbox-sm checkbox-secondary"
+            />
             <span className="label-text">Instagram</span>
           </label>
         </div>
@@ -114,7 +126,7 @@ export default function DetailPage() {
           <details className="collapse collapse-arrow bg-base-200 rounded-lg">
             <summary className="collapse-title font-medium">2025</summary>
             <div className="collapse-content">
-              <ul className="space-y-2 pl-2">
+              <ul className="space-y-2">
                 <li className="flex items-center gap-2">
                   <input
                     type="checkbox"
@@ -137,137 +149,153 @@ export default function DetailPage() {
 
       <main className="flex-1 bg-base-100 p-6">
         <h1 className="text-2xl font-bold mb-6 text-center">Recent Posts</h1>
-        <div className="space-y-4">
-          {posts.map((post) => {
-            const relatedMedia = mediaNotes.filter((media) =>
-              media.tags.some((tag) => tag[0] === "e" && tag[1] === post.id)
-            );
+        {loading ? (
+          <div className="flex justify-center items-center h-40">
+            <progress className="progress w-56" />
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {posts.map((post) => {
+              const relatedMedia = mediaNotes.filter((media) =>
+                media.tags.some((tag) => tag[0] === "e" && tag[1] === post.id)
+              );
 
-            const relatedReplies = replies.filter((reply) =>
-              reply.tags.some((tag) => tag[0] === "e" && tag[1] === post.id)
-            );
+              const relatedReplies = replies.filter((reply) =>
+                reply.tags.some((tag) => tag[0] === "e" && tag[1] === post.id)
+              );
 
-            return (
-              <div key={post.id} className="card bg-base-100 shadow">
-                <div className="card-body">
-                  <div className="flex gap-1">
-                    <div className="text-sm text-gray-500 shrink-0">
-                      <i className="bi bi-twitter text-blue-500 mr-1" />
-                      {new Date(post.created_at * 1000).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </div>
+              return (
+                <div key={post.id} className="card bg-base-100 shadow">
+                  <div className="card-body">
+                    <div className="flex gap-1">
+                      <div className="text-sm text-gray-500 shrink-0">
+                        <i className="bi bi-twitter text-blue-500 mr-1" />
+                        {new Date(post.created_at * 1000).toLocaleTimeString(
+                          [],
+                          {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          }
+                        )}
+                      </div>
 
-                    <div className="flex-1 space-y-4">
-                      <p className="whitespace-pre-wrap">{post.content}</p>
+                      <div className="flex-1 space-y-4">
+                        <p className="whitespace-pre-wrap">{post.content}</p>
 
-                      {relatedMedia.map((media) => {
-                        const url = media.tags.find(
-                          (tag) => tag[0] === "url"
-                        )?.[1];
-                        const video = media.tags.find(
-                          (tag) => tag[0] === "video"
-                        )?.[1];
-                        const type = media.tags.find(
-                          (tag) => tag[0] === "m"
-                        )?.[1];
+                        {relatedMedia.map((media) => {
+                          const url = media.tags.find(
+                            (tag) => tag[0] === "url"
+                          )?.[1];
+                          const video = media.tags.find(
+                            (tag) => tag[0] === "video"
+                          )?.[1];
+                          const type = media.tags.find(
+                            (tag) => tag[0] === "m"
+                          )?.[1];
 
-                        return (
-                          <div
-                            key={media.id}
-                            className="mt-4 w-full max-w-xl mx-auto"
-                          >
-                            {type === "photo" ? (
-                              <img src={url} alt="media" className="rounded" />
-                            ) : type === "video" && video ? (
-                              <video
-                                controls
-                                className="rounded w-full aspect-video"
-                              >
-                                <source src={video} />
-                              </video>
-                            ) : null}
-                          </div>
-                        );
-                      })}
+                          return (
+                            <div
+                              key={media.id}
+                              className="mt-4 w-full max-w-xl mx-auto"
+                            >
+                              {type === "photo" ? (
+                                <img
+                                  src={url}
+                                  loading="lazy"
+                                  alt="media"
+                                  className="rounded"
+                                />
+                              ) : type === "video" && video ? (
+                                <video
+                                  controls
+                                  preload="none"
+                                  className="rounded w-full aspect-video"
+                                  poster="https://peach.blender.org/wp-content/uploads/title_anouncement.jpg"
+                                >
+                                  <source src={video} />
+                                </video>
+                              ) : null}
+                            </div>
+                          );
+                        })}
 
-                      {relatedReplies.length > 0 && (
-                        <div className="mt-6">
-                          <h3 className="font-semibold mb-2">Replies</h3>
-                          <ul className="timeline timeline-vertical justify-start">
-                            {relatedReplies
-                              .sort((a, b) => b.created_at - a.created_at)
-                              .map((reply, index) => {
-                                const replyMedia = replyMediaNotes.filter(
-                                  (media) =>
-                                    media.tags.some(
-                                      (tag) =>
-                                        tag[0] === "e" && tag[1] === reply.id
-                                    )
-                                );
+                        {relatedReplies.length > 0 && (
+                          <div className="mt-6">
+                            <h3 className="font-semibold mb-2">Replies</h3>
+                            <ul className="timeline timeline-vertical justify-start">
+                              {relatedReplies
+                                .sort((a, b) => b.created_at - a.created_at)
+                                .map((reply, index) => {
+                                  const replyMedia = replyMediaNotes.filter(
+                                    (media) =>
+                                      media.tags.some(
+                                        (tag) =>
+                                          tag[0] === "e" && tag[1] === reply.id
+                                      )
+                                  );
 
-                                return (
-                                  <li key={reply.id}>
-                                    {index > 0 && <hr />}
-                                    <div className="timeline-start">
-                                      {formatTimestamp(reply.created_at)}
-                                    </div>
-                                    <div className="timeline-middle">
-                                      <div className="h-3 w-3 bg-primary rounded-full"></div>
-                                    </div>
-                                    <div className="timeline-end timeline-box">
-                                      <div className="text-xs text-gray-500 mb-1">
-                                        @{nip19.npubEncode(reply.pubkey)}
+                                  return (
+                                    <li key={reply.id}>
+                                      {index > 0 && <hr />}
+                                      <div className="timeline-start">
+                                        {formatTimestamp(reply.created_at)}
                                       </div>
-                                      <p className="mb-2 whitespace-pre-wrap">
-                                        {reply.content}
-                                      </p>
+                                      <div className="timeline-middle">
+                                        <div className="h-3 w-3 bg-primary rounded-full"></div>
+                                      </div>
+                                      <div className="timeline-end timeline-box">
+                                        <div className="text-xs text-gray-500 mb-1">
+                                          @{nip19.npubEncode(reply.pubkey)}
+                                        </div>
+                                        <p className="mb-2 whitespace-pre-wrap">
+                                          {reply.content}
+                                        </p>
 
-                                      {replyMedia.map((media) => {
-                                        const url = media.tags.find(
-                                          (tag) => tag[0] === "url"
-                                        )?.[1];
-                                        if (!url) return null;
-                                        return /\.(jpg|jpeg|png|gif)(\?.*)?$/i.test(
-                                          url
-                                        ) ? (
-                                          <img
-                                            key={media.id}
-                                            src={url}
-                                            alt="Media"
-                                            className="rounded mt-2 w-full max-w-md"
-                                          />
-                                        ) : /\.(mp4|webm)(\?.*)?$/i.test(
+                                        {replyMedia.map((media) => {
+                                          const url = media.tags.find(
+                                            (tag) => tag[0] === "url"
+                                          )?.[1];
+                                          if (!url) return null;
+                                          return /\.(jpg|jpeg|png|gif)(\?.*)?$/i.test(
                                             url
                                           ) ? (
-                                          <video
-                                            key={media.id}
-                                            controls
-                                            className="rounded mt-2 w-full max-w-md mx-auto"
-                                          >
-                                            <source src={url} />
-                                          </video>
-                                        ) : null;
-                                      })}
-                                    </div>
-                                  </li>
-                                );
-                              })}
-                          </ul>
-                        </div>
-                      )}
+                                            <img
+                                              key={media.id}
+                                              src={url}
+                                              alt="Media"
+                                              className="rounded mt-2 w-full max-w-md"
+                                            />
+                                          ) : /\.(mp4|webm)(\?.*)?$/i.test(
+                                              url
+                                            ) ? (
+                                            <video
+                                              key={media.id}
+                                              controls
+                                              className="rounded mt-2 w-full max-w-md mx-auto"
+                                            >
+                                              <source src={url} />
+                                            </video>
+                                          ) : null;
+                                        })}
+                                      </div>
+                                    </li>
+                                  );
+                                })}
+                            </ul>
+                          </div>
+                        )}
 
-                      <div className="text-sm text-gray-400 mt-2">
-                        {new Date(post.created_at * 1000).toLocaleString()}
+                        <div className="text-sm text-gray-400 mt-2">
+                          {new Date(post.created_at * 1000).toLocaleString()}
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </main>
     </div>
   );

@@ -208,8 +208,8 @@ export default function DetailPage() {
                               ) : type === "video" && video ? (
                                 <video
                                   controls
-                                  preload="none"
                                   className="rounded w-full aspect-video"
+                                  poster="https://peach.blender.org/wp-content/uploads/title_anouncement.jpg"
                                 >
                                   <source src={video} />
                                 </video>
@@ -261,7 +261,6 @@ export default function DetailPage() {
                                             <img
                                               key={media.id}
                                               src={url}
-                                              loading="lazy"
                                               alt="Media"
                                               className="rounded mt-2 w-full max-w-md"
                                             />
@@ -271,7 +270,6 @@ export default function DetailPage() {
                                             <video
                                               key={media.id}
                                               controls
-                                              preload="none"
                                               className="rounded mt-2 w-full max-w-md mx-auto"
                                             >
                                               <source src={url} />

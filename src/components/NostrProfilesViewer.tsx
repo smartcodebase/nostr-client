@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { SimplePool, nip19, type Event } from "nostr-tools";
-import { getPublicKey, finalizeEvent } from "nostr-tools";
+import { finalizeEvent } from "nostr-tools";
 
 import { fetchProfiles } from "../lib/nostr-profiles";
 

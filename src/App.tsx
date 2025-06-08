@@ -1,14 +1,11 @@
 import "./App.css";
-// import NostrFeed from "./components/NostrFeed";
-import NostrProfilesViewer from "./components/NostrProfilesViewer";
+import { Outlet } from "react-router-dom";
 
 function App() {
   return (
-    <>
-      <h2> Nostr Viewer </h2>
-      {/* <NostrFeed /> */}
-      <NostrProfilesViewer />
-    </>
+    <div className="layout">
+      <Outlet />
+    </div>
   );
 }
 
